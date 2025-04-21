@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixiJS and Socket.IO</title>
+    <script src="https://pixijs.download/release/pixi.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <script type="module">
+        // Initialize PixiJS
+        const app = new PIXI.Application();
+        const { Assets } = PIXI;
+
+        app.init({
+            width: 800,
+            height: 600,
+            backgroundColor: 0x1099bb
+        });
+
+        document.addEventListener("DOMContentLoaded", () => { //Lädt erst wenn PIXI vollständig initialisiert wurde
+            document.body.appendChild(app.canvas);
+            console.log("PixiJS ist vollständig geladen:", app.renderer);
+            window.app = app; // Global variable for debugging
+            window.PIXI = PIXI; // Global variable for debugging
+        });
+
+
+        import { Game } from "./Client/game.js"; // Importiere die game.js Datei
+        
+        const socket = io(); // Initialisiere Socket.IO
+        let game; // Variable für die Game-Instanz
+        socket.on("connected", (data) => {
+            app.stage.removeChildren(); // Entferne alle Kinder des Stages
+            game = new Game(800 / data.gridSize, 600 / data.gridSize, app, socket, data.gridSize); // Erstelle eine neue Instanz der Game-Klasse
+            socket.on("game:cellUpdate", (data) => {
+                game.setCellOwner(data.row, data.col, data.OwnerID, data.color); // Aktualisiere die Zelle im Spiel
+            });
+
+            socket.on("game:territoryUpdate", (data) => {
+                game.updateGameField(data); // Aktualisiere die Zelle im Spiel
+            });
+
+            socket.on("ui:update", (data) => {
+                //game.updateUI(data); // Aktualisiere die Zelle im Spiel
+            });
+
+            //drawGrid(game.gridSize); // Funktion zum Zeichnen des Rasters
+        });
+
+
+
+
+
+
+        document.addEventListener("click", (e) => {
+            if(!game) return; // Überprüfe, ob die game-Instanz existiert
+            const rect = app.canvas.getBoundingClientRect(); // Position und Größe des Canvas
+            const offsetX = e.clientX - rect.left; // X-Versatz relativ zum Canvas
+            const offsetY = e.clientY - rect.top;  // Y-Versatz relativ zum Canvas
+            let gridX = Math.floor(offsetX / game.gridSize); // Berechne die X-Position im Raster
+            let gridY = Math.floor(offsetY / game.gridSize); // Berechne die Y-Position im Raster
+
+
+            game.attack(gridX, gridY); // Setze den Besitzer der Zelle auf 1 (Spieler 1)
+        });
+
+
+
+
+
+        function drawGrid() {
+            if(!game) return; // Überprüfe, ob die game-Instanz existiert
+            let grid = new PIXI.Graphics()
+                .moveTo(0, 0) // Startpunkt
+                .lineTo(game.gridSize, 0) // Linie nach rechts
+                .lineTo(game.gridSize, game.gridSize) // Linie nach unten
+                .lineTo(0, game.gridSize) // Linie nach links
+                .lineTo(0, 0) // Linie nach oben
+                .closePath() // Schließe den Pfad
+                .stroke('black');
+            for (let i = 0; i < 800 / game.gridSize; i++) {
+                for (let j = 0; j < 600 / game.gridSize; j++) {
+                    let gridClone = grid.clone();
+                    gridClone.x = i * game.gridSize;
+                    gridClone.y = j * game.gridSize;
+                    app.stage.addChild(gridClone);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
