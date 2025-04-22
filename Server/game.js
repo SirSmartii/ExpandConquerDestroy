@@ -79,11 +79,11 @@ export class Game {
             if (player.getID() === -1) return; // Spieler existiert nicht
             const playerID = player.getID(); // Assuming 'id' is a property of the player object
             let growthCount = 0; // Zähler für das Wachstum des Spielers
-            if (player.getGold() <= growthTick*3) { // Assuming 'resources' is an object with a 'gold' property
+            if (player.getGold() <= growthTick * 3) { // Assuming 'resources' is an object with a 'gold' property
                 growthTick = 0;
             }
 
-            player.spendGold(growthTick*3); // Deduct gold directly if 'spendResource' is not defined
+            player.spendGold(growthTick * 3); // Deduct gold directly if 'spendResource' is not defined
             for (let row = 0; row < this.rows; row++) {
                 for (let col = 0; col < this.cols; col++) {
                     if (this.gameField[row][col] === playerID) {
@@ -144,10 +144,11 @@ export class Game {
     setCellOwner(row, col, socketID) {
         if (this.isValidCell(row, col)) {
             const playerID = this.playerManager.getPlayerId(socketID); // Hole die ID des Spielers
-            if (this.gameField[row][col] == 0) {
-
+            if(this.playerManager.getPlayer(socketID).isAlive === true) return; // Spieler ist tot{
+            if (this.gameField[row][col] === 0) {
                 this.gameField[row][col] = playerID; // Setze den Besitzer der Zelle
                 console.log("Cell updated: " + row + ", " + col + " -> " + " PLAYER: " + this.gameField[row][col]);
+                this.playerManager.getPlayer(socketID).isAlive = true; // Deduct gold directly if 'spendResource' is not defined
             }
         }
     }

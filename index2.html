@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixiJS and Socket.IO</title>
+    <script src="https://pixijs.download/release/pixi.js"></script>
+    <script src="C:\PIXI\ExpandConquerDestroy\node_modules\socket.io\client-dist\socket.io.js"></script>
+</head>
+
+<body>
+    <script type="module">
+        //Game variables
+        let socket = io(); // Initialisiere Socket.IO
+		socket.connect('http:127.0.0.1:3000');
+        socket.onAny((event, ...args) => {
+			console.log(`Ereignis: ${event}`, args);
+		});
+    </script>
+</body>
+
+</html>

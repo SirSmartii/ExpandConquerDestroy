@@ -10,6 +10,17 @@
 
 <body>
     <script type="module">
+        //#region Imports
+        
+        import { Game } from "./Client/game.js"; // Importiere die game.js Datei
+        
+        
+        //#endregion Imports
+
+        //UI Variables
+        let GoldText = null;
+        
+        
         // Initialize PixiJS
         const app = new PIXI.Application();
         const { Assets } = PIXI;
@@ -28,13 +39,12 @@
         });
 
 
-        import { Game } from "./Client/game.js"; // Importiere die game.js Datei
-        
         const socket = io(); // Initialisiere Socket.IO
         let game; // Variable für die Game-Instanz
         socket.on("connected", (data) => {
             app.stage.removeChildren(); // Entferne alle Kinder des Stages
             game = new Game(800 / data.gridSize, 600 / data.gridSize, app, socket, data.gridSize); // Erstelle eine neue Instanz der Game-Klasse
+
             socket.on("game:cellUpdate", (data) => {
                 game.setCellOwner(data.row, data.col, data.OwnerID, data.color); // Aktualisiere die Zelle im Spiel
             });
@@ -44,6 +54,7 @@
             });
 
             socket.on("ui:update", (data) => {
+                drawUI(data.gold); // Zeichne die Benutzeroberfläche
                 //game.updateUI(data); // Aktualisiere die Zelle im Spiel
             });
 
@@ -56,7 +67,7 @@
 
 
         document.addEventListener("click", (e) => {
-            if(!game) return; // Überprüfe, ob die game-Instanz existiert
+            if (!game) return; // Überprüfe, ob die game-Instanz existiert
             const rect = app.canvas.getBoundingClientRect(); // Position und Größe des Canvas
             const offsetX = e.clientX - rect.left; // X-Versatz relativ zum Canvas
             const offsetY = e.clientY - rect.top;  // Y-Versatz relativ zum Canvas
@@ -69,10 +80,26 @@
 
 
 
+        function drawUI(gold) {
+            if (!game) return; // Überprüfe, ob die game-Instanz existiert
+            const style = new PIXI.TextStyle({
+                fontFamily: 'Arial',
+                fontSize: 16,
+                fill: 'black', // Textfarbe
+            });
 
+            if (!GoldText) {
+                const text = new PIXI.Text({ text: 'GOLD: ' + gold, style });
+                goldui = text;
+                app.stage.addChild(GoldText);
+            }
+            GoldText.anchor.set(1, 1);
+            GoldText.x = app.screen.width - 10; // Positioniere den Text am rechten Rand
+            GoldText.y = app.screen.height - 10; // Positioniere den Text am unteren Rand
+        }
 
         function drawGrid() {
-            if(!game) return; // Überprüfe, ob die game-Instanz existiert
+            if (!game) return; // Überprüfe, ob die game-Instanz existiert
             let grid = new PIXI.Graphics()
                 .moveTo(0, 0) // Startpunkt
                 .lineTo(game.gridSize, 0) // Linie nach rechts

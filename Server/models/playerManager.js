@@ -6,7 +6,7 @@ export class PlayerManager {
     }
 
     // Spieler hinzufügen und entfernen
-    addPlayer(name = "default", socketID) {
+    addPlayer(socketID, name = "default") {
         if (this.players[socketID]) {
             console.log("Player already exists"); // Fehler werfen, wenn der Spieler bereits existiert
         }

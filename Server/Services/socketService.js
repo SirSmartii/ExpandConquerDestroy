@@ -13,7 +13,7 @@ app.get('/', (req, res) => {
 });
 app.use('/Client', express.static(path.join(__dirname, '../../Client'))); // Korrigierter Pfad
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 3000;
 server.listen(port, () => {
     console.log('Server is running on port ' + port);
 });

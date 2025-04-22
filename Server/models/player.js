@@ -7,11 +7,11 @@ export class Player{
         this.socketID = socketID; // Socket-ID des Spielers
         this.color = 0xFF0000; // Standardfarbe (Rot)
         this.territorySize = 0; // Standardgröße des Territoriums
-        this.isAlive = true; // Standardmäßig ist der Spieler am Leben
+        this.isAlive = false; // Standardmäßig ist der Spieler am Leben
         this.gold = 50; // Gold des Spielers
         this.iron = 0; // Eisen des Spielers
         this.stone = 0; // Stein des Spielers
-        this.growthStyle = 17; // Wachstumsstil des Spielers
+        this.growthStyle = 3; // Wachstumsstil des Spielers
     }
 
     getGrowthStyle() {
